@@ -1,12 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>EDRS</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EDRS: Explanations Using Defeasible Rule Sets</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Project made by losers</h1>
-<p>This is the project content</p>
+<header>
+  <img src="images/header.png" alt="Explanations Using Defeasible Rule Sets">
+  <nav>
+    <a href="#goals">Goals</a>
+    <a href="#background">Background</a>
+    <a href="#workbench">Workbench</a>
+    <a href="#results">Results</a>
+    <a href="#team">Team</a>
+    <a href="#documents">Documents</a>
+  </nav>
+</header>
+
+<main>
+
+  <section id="goals">
+    <h2>Project goals</h2>
+    <p>
+      An ECCRS classifier explains each prediction by pointing at the rule that decided it.
+      We asked whether those explanations are formally sound: does each prediction actually
+      follow from the rule set under KLM defeasible reasoning?
+    </p>
+    <ul>
+      <li>Translate ECCRS rule sets into KLM knowledge bases.</li>
+      <li>Implement Rational Closure, Lexicographic Closure and System W.</li>
+      <li>Compare every prediction against the classifier, instance by instance.</li>
+    </ul>
+  </section>
+
+  <section id="background">
+    <h2>Background</h2>
+    <h3>Rule-based explanations</h3>
+    <p>
+      Classifiers make high-stakes calls such as loans and diagnoses, and people need to know why.
+      Rule-based classifiers learn IF-THEN rules from data, so every prediction comes with the rule
+      that made it. When rules conflict, ECCRS lets the most specific rule win (MSW).
+    </p>
+    <h3>Defeasible reasoning</h3>
+    <p>
+      Defeasible reasoning is the formal logic of exceptions: birds typically fly, penguins are
+      birds, penguins don't fly. Madzime and Meyer proved that, under three structural assumptions,
+      MSW gives the same answers as KLM defeasible entailment. We test that claim on real rule sets.
+    </p>
+    <figure>
+      <img src="images/translation.png" alt="An ECCRS rule set translated into a defeasible knowledge base">
+      <figcaption>Each rule becomes a defeasible statement: label 1 becomes m, label 0 becomes &not;m.</figcaption>
+    </figure>
+  </section>
+
+  <section id="workbench">
+    <h2>The workbench</h2>
+    <p>
+      A C workbench checks the three assumptions, runs MSW inference with an explanation trace
+      for every instance, translates the rule set into a KLM knowledge base, and asks each closure
+      whether the instance entails m or &not;m. The two sides are then compared side by side.
+    </p>
+    <figure>
+      <img src="images/workbench.jpg" alt="Workbench pipeline">
+      <figcaption>The workbench pipeline.</figcaption>
+    </figure>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+    <table>
+      <caption>Assumptions hold: Bank, Breast Cancer and Mushroom rule sets</caption>
+      <thead>
+        <tr><th>Instances</th><th>RC</th><th>LC</th><th>System W</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>13,509</td><td>100%</td><td>100%</td><td>100%</td></tr>
+      </tbody>
+    </table>
+
+    <table>
+      <caption>Assumptions broken on purpose (MSW vs LC, 13,509 instances per row)</caption>
+      <thead>
+        <tr><th>Assumption broken</th><th>Agree</th><th>Abstain</th><th>Conflict</th><th>Wrong label</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Exception closure</td><td>13,395</td><td>114</td><td>0</td><td>0</td></tr>
+        <tr><td>Sanity</td><td>12,019</td><td>0</td><td>1,490</td><td>0</td></tr>
+        <tr><td>No total override</td><td>13,374</td><td>0</td><td>135</td><td>0</td></tr>
+      </tbody>
+    </table>
+    <p>
+      On every tested instance, the label ECCRS predicts is the label all three closures entail.
+      When an assumption breaks, the check fails safely: an abstention or a flagged conflict,
+      never a confident wrong label.
+    </p>
+  </section>
+
+  <section id="team">
+    <h2>Team</h2>
+    <div class="cards">
+      <a class="card" href="antony/index.html">
+        <strong>Antony Baker</strong>
+        <span>[closure]</span>
+      </a>
+      <a class="card" href="daniel/index.html">
+        <strong>Daniel Schlesinger</strong>
+        <span>[closure]</span>
+      </a>
+      <a class="card" href="august/index.html">
+        <strong>Augustine Mochoeneng</strong>
+        <span>Lexicographic Closure</span>
+      </a>
+    </div>
+    <p>Supervisor: Prof. Thomas Meyer, Department of Computer Science, University of Cape Town.</p>
+  </section>
+
+  <section id="documents">
+    <h2>Documents</h2>
+    <ul>
+      <li><a href="docs/proposal.pdf">Project proposal</a> (PDF)</li>
+      <li><a href="docs/poster.pdf">Project poster</a> (PDF)</li>
+      <li><a href="docs/presentation.pdf">Presentation slides</a> (PDF)</li>
+    </ul>
+    <p>Individual papers and source code are on each team member's page.</p>
+  </section>
+
+</main>
+
+<footer>
+  <p>Department of Computer Science, University of Cape Town &middot; Honours Project 2026</p>
+</footer>
 
 </body>
 </html>
+
