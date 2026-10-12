@@ -24,8 +24,8 @@
 
 <header>
   <p class="back"><a href="../index.html">&larr; EDRS project</a></p>
-  <h1>Lexicographic Closure</h1>
-  <p class="byline">Augustine Mochoeneng &middot; <a href="mailto:MCHKOK003@myuct.ac.za">MCHKOK003@myuct.ac.za</a></p>
+  <h1>Rational Closure </h1>
+  <p class="byline">Daniel Schlesinger &middot; <a href="mailto:schdan066@myuct.ac.za">SCHDAN066@myuct.ac.za</a></p>
   <nav>
     <a href="#contribution">Contribution</a>
     <a href="#approach">Approach</a>
@@ -40,21 +40,28 @@
     <h2>Contribution</h2>
     <p class="lead">
       I built the workbench end to end and used it to test the alignment theorem with
-      Lexicographic Closure.
+      Rational Closure (RC). I also implemented and measured an optimised Rational Closure.
+
+grouping
+patterns by which rules they make applicable, instead of calling
+the satisfiability oracle once per pattern, cuts those calls by up
+to 964-fold on Bank Marketing, the largest of the three rulesets
+(904-fold against a naive ascending-scan baseline rather than the
+binary search shipped by default), verified by differential testing
+against the ungrouped computation.
     </p>
     <ul class="rules">
-      <li><b>Workbench:</b> an executable version of the ECCRS-to-KLM translation, written in C.</li>
-      <li><b>Lexicographic Closure:</b> entailment over the translated knowledge base.</li>
-      <li><b>Verification:</b> MSW against LC on every instance of three benchmark rule sets.</li>
-      <li><b>Violation study:</b> rule sets that break each assumption on purpose, to see how the
-        agreement fails.</li>
+      <li><b>Workbench:</b> A Command Line Interface application of ECCRS-to-KLM translation, written in python.</li>
+      <li><b>Naivee Rational Closure :</b> entailment over the translated knowledge base.</li>
+      <li><b>Optimised Rational Closure :</b> entailment over the translated knowledge base using an optimized version  of Rational Closure.</li>
+      <li><b>Verification:</b> MSW against RC on every instance of three benchmark rule sets.</li>
     </ul>
   </section>
 
   <section id="approach" class="explain">
     <h2>Approach</h2>
 
-    <h3>The idea behind Lexicographic Closure</h3>
+    <h3>The idea behind Rational  Closure</h3>
     <p>
       Rational Closure answers a query by throwing away whole ranks of statements until the
       query makes sense. That is often too blunt: penguins lose "birds have wings" just because
@@ -95,7 +102,8 @@
       <li><b>MSW side:</b> computes $\mathcal{A}(F)$ and $\mathcal{M}(F)$ and writes an explanation
         trace for every instance.</li>
       <li><b>Translator:</b> maps each rule to one typical statement, linear in the size of the rule set.</li>
-      <li><b>Reasoner:</b> every consistency check goes to a SAT solver (PicoSAT, bundled with the
+      
+    <li><b>Reasoner:</b> DAN REWRITE THIS: every consistency check goes to a SAT solver (PicoSAT, bundled with the
         code), and instances are answered in parallel with OpenMP.</li>
       <li><b>Agreement check:</b> compares the two verdicts per instance and sorts each into agree,
         abstain, disagree or conflict.</li>
@@ -108,7 +116,7 @@
     <h3>When the assumptions hold</h3>
     <table>
       <thead>
-        <tr><th>Rule set</th><th>Instances</th><th>MSW = LC</th></tr>
+        <tr><th>Rule set</th><th>Instances</th><th>MSW =RC </th></tr>
       </thead>
       <tbody>
         <tr><td>Bank</td><td>11,303</td><td>100%</td></tr>
@@ -118,28 +126,6 @@
       </tbody>
     </table>
 
-    <h3>When an assumption is broken</h3>
-    <table>
-      <thead>
-        <tr><th>Assumption broken</th><th>Agree</th><th>Abstain</th><th>Conflict</th><th>Wrong label</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Exception closure</td><td>13,395</td><td>114</td><td>0</td><td>0</td></tr>
-        <tr><td>Sanity</td><td>12,019</td><td>0</td><td>1,490</td><td>0</td></tr>
-        <tr><td>No total override</td><td>13,374</td><td>0</td><td>135</td><td>0</td></tr>
-      </tbody>
-    </table>
-    <ul class="rules">
-      <li><b>Exception closure broken:</b> one or both sides abstain instead of guessing.</li>
-      <li><b>Sanity or total override broken:</b> LC entails both labels, and the instance is
-        flagged as a conflict.</li>
-      <li><b>Total override:</b> the 135 conflicts are exactly the instances where ECCRS itself
-        changed its answer.</li>
-    </ul>
-    <p class="punchline">
-      Agreement is perfect when the theorem's assumptions hold, and when they break the check
-      fails safely: never a confident wrong label.
-    </p>
   </section>
 
   <section id="documents">
