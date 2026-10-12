@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>EDRS: Explanations Using Defeasible Rule Sets</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="katex/katex.min.css">
+  <script defer src="katex/katex.min.js"></script>
+  <script defer src="katex/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ], 
+        macros: { "\\dent": "\\mathrel{\\mid\\!\\sim}" }
+      });
+    });
+  </script>
 </head>
 <body>
 
@@ -65,23 +79,181 @@
 
   <section id="background">
     <h2>Background</h2>
-    <h3>ECCRS</h3>
-    <p>
-      Classifiers make high-stakes calls such as loans and diagnoses, and people need to know why.
-      Rule-based classifiers learn IF-THEN rules from data, so every prediction comes with the rule
-      that made it. When rules conflict, ECCRS lets the most specific rule win (MSW).
+  
+   <section id="eccrs">
+    <h2>ECCRS: Exception-Closed Conjunctive Rule Sets</h2>
+    <p class="lead">
+      A classifier made of IF-THEN rules. When rules disagree, the most specific one wins,
+      and the steps that pick the winner are the explanation.
     </p>
-    <h3>Defeasible reasoning</h3>
-    <p>
-      Defeasible reasoning is the formal logic of exceptions: birds typically fly, penguins are
-      birds, penguins don't fly. Madzime and Meyer proved that, under three structural assumptions,
-      MSW gives the same answers as KLM defeasible entailment. We test that claim on real rule sets.
+
+    <h3>The rules</h3>
+    <p>Each rule is a pair $(B, \ell)$: a body $B$ of feature values, and a label $\ell$.</p>
+    <div class="rules">
+     <ul class="rules">
+      <li>$r_1$: odour = none $\Rightarrow$ edible</li>
+      <li>$r_2$: odour = none $\land$ spore = green $\Rightarrow$ poisonous <span class="tag">(exception to $r_1$)</span></li>
+      <li>$r_3$: odour = foul $\Rightarrow$ poisonous</li>
+    </ul>
+
+    <h3 id="msw">How a prediction is made</h3>
+    <div class="steps" >
+      <div class="step">
+        <div class="what">
+          <span class="n">1</span>
+          <strong>Applicable rules</strong>
+          <p>Keep every rule whose body the instance satisfies.</p>
+        </div>
+        $$\mathcal{A}(F) = \{ (B, \ell) \in \mathcal{R} : F \models B \}$$
+      </div>
+      <div class="step">
+        <div class="what">
+          <span class="n">2</span>
+          <strong>Inclusion-Maximal Applicable Rules</strong>
+          <p>Drop any rule with a strictly more specific rival.</p>
+        </div>
+        $$\mathcal{M}(F) = \{ (B, \ell) \in \mathcal{A}(F) : \nexists (C, \ell') \in \mathcal{A}(F),\ B \subset C \}$$
+      </div>
+      <div class="step">
+        <div class="what">
+          <span class="n">3</span>
+          <strong>Most Specific Wins</strong>
+          <p>Answer with their label, or abstain if nothing applies.</p>
+        </div>
+        $$\mathrm{MSW}(F) = \begin{cases} \ell & \text{all of } \mathcal{M}(F) \text{ say } \ell \\ \bot & \mathcal{M}(F) = \emptyset \end{cases}$$
+      </div>
+    </div>
+    <p class="note">
+      Strict exception closure guarantees $\mathcal{M}(F)$ never holds both labels, so step 3
+      never has to break a tie.
     </p>
-    <figure>
-      <img src="images/translation.png" alt="An ECCRS rule set translated into a defeasible knowledge base">
-      <figcaption>Each rule becomes a defeasible statement: label 1 becomes m, label 0 becomes &not;m.</figcaption>
-    </figure>
+
+    <h3>Try it: odour = none, spore = green</h3>
+    <ol class="trace">
+      <li><b class="k">Fires</b> $r_1$ and $r_2$. $r_3$ stays quiet.</li>
+      <li><b class="k">Compare</b> $B_{r_1} \subset B_{r_2}$, so $r_2$ overrides $r_1$.</li>
+      <li><b class="k">Winner</b> $\mathcal{M}(F) = \{r_2\}$</li>
+      <li class="answer"><b class="k">Answer</b> poisonous</li>
+    </ol>
+    <p class="punchline">
+      That trace <em>is</em> the explanation. No separate story is bolted on afterwards.
+    </p>
+  </section>    
+  <section id="defeasible" class="explain">
+    <h2>Defeasible reasoning (KLM)</h2>
+    <p class="lead">
+      Classical logic breaks on exceptions. Defeasible reasoning draws conclusions that hold
+      typically, and drops them when more specific information turns up.
+    </p>
+
+    <h3>Why classical logic is not enough</h3>
+    <ul class="rules">
+      <li>$\text{bird} \rightarrow \text{flies}$</li>
+      <li>$\text{penguin} \rightarrow \text{bird}$</li>
+      <li>$\text{penguin} \rightarrow \neg\text{flies}$</li>
+    </ul>
+    <p>Taken together, these say penguins cannot exist.</p>
+
+    <h3>Typical statements</h3>
+    <p>KLM writes $\alpha \dent \beta$ for "if $\alpha$, then typically $\beta$".</p>
+    <ul class="rules">
+      <li>$\text{bird} \dent \text{flies}$ <span class="tag">(birds typically fly)</span></li>
+      <li>$\text{penguin} \rightarrow \text{bird}$</li>
+      <li>$\text{penguin} \dent \neg\text{flies}$</li>
+    </ul>
+    <p>Now penguins are simply an exception: birds that don't fly.</p>
+
+    <h3>How a query is answered</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="what">
+          <strong>Rank</strong>
+          <p>Sort statements from general (rank 0) to specific. A statement moves up if its
+            antecedent clashes with everything at its level.</p>
+        </div>
+        $$\mathcal{E}_0 = \mathcal{K}, \qquad \mathcal{E}_{i+1} = \{ \alpha \dent \beta \in \mathcal{E}_i : \overrightarrow{\mathcal{E}_i} \models \neg\alpha \}$$
+      </div>
+      <div class="step">
+        <div class="what">
+          <strong>Drop</strong>
+          <p>To ask $\alpha \dent \beta$, throw away the most general ranks until $\alpha$ is
+            consistent with what is left.</p>
+        </div>
+        $$\mathcal{K} \models \alpha \dent \beta \iff \overrightarrow{\mathcal{R}_{\geq i}} \models \alpha \rightarrow \beta$$
+      </div>
+      <div class="step">
+        <div class="what">
+          <strong>Three closures</strong>
+          <p>They differ only in what they drop.</p>
+        </div>
+        <ul class="closures">
+          <li><b>Rational Closure:</b> whole ranks.</li>
+          <li><b>Lexicographic Closure:</b> as few statements as possible from the clashing rank.</li>
+          <li><b>System W:</b> compares worlds by the set of statements they break.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">
+      $\overrightarrow{X}$ reads each $\alpha \dent \beta$ in $X$ as $\alpha \rightarrow \beta$.
+      $\mathcal{R}_{\geq i}$ is everything ranked $i$ or higher, where $i$ is the lowest rank at
+      which $\alpha$ stops clashing.
+    </p>
   </section>
+
+  <section id="translation" class="explain">
+    <h2>From ECCRS to KLM</h2>
+    <p class="lead">
+      ECCRS decides by specificity. KLM decides by defeasible entailment. To compare the two
+      on the same question, the rule set first has to become a knowledge base.
+    </p>
+
+    <h3>The translation</h3>
+    <p>
+      One atom, $m$, stands for the class: $m$ is label 1 and $\neg m$ is label 0. Each rule
+      becomes one typical statement with the same body:
+    </p>
+    $$(B, 1) \mapsto B \dent m \qquad\qquad (B, 0) \mapsto B \dent \neg m$$
+    $$\mathcal{K}(\mathcal{R}) = \{ B \dent m : (B, 1) \in \mathcal{R} \} \cup \{ B \dent \neg m : (B, 0) \in \mathcal{R} \}$$
+    <p class="note">
+      Using a single atom makes the two labels exact opposites, so "abstain" simply means
+      neither $m$ nor $\neg m$ is entailed.
+    </p>
+
+    <h3>On the running example</h3>
+    <ul class="rules">
+      <li>$r_1$: odour = none $\Rightarrow$ edible <span class="tag">becomes</span> $\text{none} \dent m$</li>
+      <li>$r_2$: odour = none $\land$ spore = green $\Rightarrow$ poisonous <span class="tag">becomes</span> $\text{none} \land \text{green} \dent \neg m$</li>
+      <li>$r_3$: odour = foul $\Rightarrow$ poisonous <span class="tag">becomes</span> $\text{foul} \dent \neg m$</li>
+    </ul>
+    <p>
+      To classify an instance $F$, ask the knowledge base two questions: does it entail
+      $F \dent m$, and does it entail $F \dent \neg m$?
+    </p>
+
+    <h3>The alignment theorem</h3>
+    <p>
+      Madzime and Meyer proved that the translation is faithful, provided the rule set
+      satisfies three assumptions:
+    </p>
+    <ul class="closures">
+      <li><b>Strict exception closure:</b> any two opposite-label rules that can apply together
+        are comparable, one body inside the other.</li>
+      <li><b>Sanity:</b> no two rules share a body but disagree on the label.</li>
+      <li><b>No total override:</b> every rule has at least one instance where no more
+        specific opposite-label rule overrides it.</li>
+    </ul>
+    <p>Then, for every complete instance $F$:</p>
+    <ol class="trace">
+      <li><b class="k">Abstain</b> no rule applies $\Rightarrow$ $\mathcal{K}$ entails neither $F \dent m$ nor $F \dent \neg m$</li>
+      <li><b class="k">Label 1</b> $\mathrm{MSW}(F) = 1 \Rightarrow \mathcal{K}$ entails $F \dent m$ only</li>
+      <li><b class="k">Label 0</b> $\mathrm{MSW}(F) = 0 \Rightarrow \mathcal{K}$ entails $F \dent \neg m$ only</li>
+    </ol>
+    <p>So the classifier's three verdicts line up exactly with the three entailment outcomes.</p>
+    <p class="punchline">
+      The theorem says the two should agree. Our workbench checks whether they actually do on
+      real rule sets, and what happens when an assumption is broken.
+    </p>
+  </section>                    
 
   <section id="workbench">
     <h2>The workbench</h2>
@@ -91,8 +263,40 @@
       whether the instance entails m or &not;m. The two sides are then compared side by side.
     </p>
     <figure>
-      <img src="images/workbench.jpg" alt="Workbench pipeline">
-      <figcaption>The workbench pipeline.</figcaption>
+      <svg class="wb" viewBox="0 0 910 660" role="img" aria-label="Workbench pipeline. Each box links to the section that explains it.">
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
+        <g class="lines">
+          <path d="M420 64 L420 110" marker-end="url(#arr)"/>
+          <path d="M670 137 L735 137" marker-end="url(#arr)"/>
+          <path d="M420 164 L420 197"/>
+          <path d="M420 197 L135 197 L135 230" marker-end="url(#arr)"/>
+          <path d="M420 197 L550 197 L550 230" marker-end="url(#arr)"/>
+          <path d="M550 284 L550 340" marker-end="url(#arr)"/>
+          <path d="M550 394 L550 422"/>
+          <path d="M550 422 L392.5 422 L392.5 450" marker-end="url(#arr)"/>
+          <path d="M550 422 L549.5 422 L549.5 450" marker-end="url(#arr)"/>
+          <path d="M550 422 L706.5 422 L706.5 450" marker-end="url(#arr)"/>
+          <path d="M135 284 L135 590" marker-end="url(#arr)"/>
+          <path d="M392.5 504 L392.5 590" marker-end="url(#arr)"/>
+          <path d="M549.5 504 L549.5 590" marker-end="url(#arr)"/>
+          <path d="M706.5 504 L706.5 590" marker-end="url(#arr)"/>
+        </g>
+        <text class="lbl" x="702" y="128" text-anchor="middle">fails</text>
+        <text class="lbl" x="428" y="186" text-anchor="start">passes</text>
+        <text class="lbl" x="143" y="216" text-anchor="start">ECCRS side</text>
+        <text class="lbl" x="558" y="216" text-anchor="start">KLM side</text>
+        <a href="#eccrs"><rect x="170" y="10" width="500" height="54" rx="8" fill="#F2F2F2"/><text x="420" y="37">ECCRS rule set + instance F</text></a>
+        <a href="#theorem"><rect x="170" y="110" width="500" height="54" rx="8" fill="#F2F2F2"/><text x="420" y="137">Assumption validator</text></a>
+        <a href="#broken"><rect x="735" y="110" width="165" height="54" rx="8" fill="#E4E4E4"/><text x="817.5" y="137">Halt &amp; report</text></a>
+        <a href="#msw"><rect x="20" y="230" width="230" height="54" rx="8" fill="#FFFFFF"/><text x="135" y="257">MSW inference</text></a>
+        <a href="#translation"><rect x="420" y="230" width="260" height="54" rx="8" fill="#FFFFFF"/><text x="550" y="257">Translation to KLM</text></a>
+        <a href="#ranking"><rect x="445" y="340" width="210" height="54" rx="8" fill="#E4E4E4"/><text x="550" y="367">BaseRank</text></a>
+        <a href="#closures"><rect x="330" y="450" width="125" height="54" rx="8" fill="#FFFFFF"/><text x="392.5" y="477">RC</text></a>
+        <a href="#closures"><rect x="487" y="450" width="125" height="54" rx="8" fill="#FFFFFF"/><text x="549.5" y="477">System W</text></a>
+        <a href="august/index.html"><rect x="644" y="450" width="125" height="54" rx="8" fill="#FFFFFF"/><text x="706.5" y="477">LC</text></a>
+        <a href="#results"><rect x="100" y="590" width="700" height="60" rx="8" fill="#E4E4E4"/><text x="450" y="620">Side-by-side traces &amp; agreement</text></a>
+      </svg>
+      <figcaption>Click any box to jump to the part of the page that explains it.</figcaption>
     </figure>
   </section>
 
