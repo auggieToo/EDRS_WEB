@@ -175,11 +175,33 @@ footer
     font-size: 1.2em; 
 }
 
-#eccrs .rules 
-{ list-style: none; padding: 0; margin: 16px 0; }
-#eccrs .rules li { padding: 4px 0; }
-#eccrs .tag { font-size: 0.85em; color: #555; }#eccrs .steps { display: grid; gap: 12px; margin: 16px 0; }
-#eccrs .step {
+#eccrs .rules
+{
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+#eccrs .rules li
+{
+  padding: 4px 0;
+}
+
+#eccrs .tag
+{
+  font-size: 0.85em;
+  color: #555;
+}
+
+#eccrs .steps
+{
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+#eccrs .step
+{
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -189,15 +211,49 @@ footer
   border-radius: 12px;
   overflow-x: auto;
 }
-#eccrs .step .what { flex: 0 1 300px; }
-#eccrs .step strong { font-family: Helvetica, Arial, sans-serif; }
-#eccrs .step p { margin: 6px 0 0; color: #555; }
-#eccrs .step .katex-display { flex: 1; margin: 0; }
-#eccrs .note { font-size: 0.9em; color: #555; }
 
-#eccrs .trace { list-style: none; padding: 0; margin: 16px 0; }
-#eccrs .trace li { padding: 6px 0; }
-#eccrs .trace .k {
+#eccrs .step .what
+{
+  flex: 0 1 300px;
+}
+
+#eccrs .step strong
+{
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+#eccrs .step p
+{
+  margin: 6px 0 0;
+  color: #555;
+}
+
+#eccrs .step .katex-display
+{
+  flex: 1;
+  margin: 0;
+}
+
+#eccrs .note
+{
+  font-size: 0.9em;
+  color: #555;
+}
+
+#eccrs .trace
+{
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+#eccrs .trace li
+{
+  padding: 6px 0;
+}
+
+#eccrs .trace .k
+{
   display: inline-block;
   min-width: 80px;
   font-family: Helvetica, Arial, sans-serif;
@@ -207,22 +263,71 @@ footer
   letter-spacing: 0.06em;
   color: #3F86C2;
 }
-#eccrs .trace li.answer { font-weight: bold; font-size: 1.15em; }
 
-#eccrs .punchline { font-size: 1.1em; }
+#eccrs .trace li.answer
+{
+  font-weight: bold;
+  font-size: 1.15em;
+}
 
-.wb { width: 100%; height: auto; display: block; }
-.wb .lines { fill: none; stroke: #111; stroke-width: 1.6; }
-.wb marker path { fill: #111; }
-.wb rect { stroke: #111; stroke-width: 1.6; transition: fill 0.15s; }
-.wb a text {
+#eccrs .punchline
+{
+  font-size: 1.1em;
+}
+
+.wb
+{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.wb .lines
+{
+  fill: none;
+  stroke: #111;
+  stroke-width: 1.6;
+}
+
+.wb marker path
+{
+  fill: #111;
+}
+
+.wb rect
+{
+  stroke: #111;
+  stroke-width: 1.6;
+  transition: fill 0.15s;
+}
+
+.wb a text
+{
   font: bold 17px Helvetica, Arial, sans-serif;
   text-anchor: middle;
   dominant-baseline: central;
   fill: #111;
   pointer-events: none;
 }
-.wb a { cursor: pointer; }
-.wb a:hover rect, .wb a:focus rect { fill: #CFE3F6; }
-.wb .lbl { font: italic 13px Georgia, serif; fill: #555; }
-html { scroll-behavior: smooth; }
+
+.wb a
+{
+  cursor: pointer;
+}
+
+.wb a:hover rect,
+.wb a:focus rect
+{
+  fill: #CFE3F6;
+}
+
+.wb .lbl
+{
+  font: italic 13px Georgia, serif;
+  fill: #555;
+}
+
+html
+{
+  scroll-behavior: smooth;
+}

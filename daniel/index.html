@@ -3,52 +3,147 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Antony Baker: [Closure] | EDRS</title>
+  <title>Augustine Mochoeneng: Lexicographic Closure | EDRS</title>
   <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../katex/katex.min.css">
+  <script defer src="../katex/katex.min.js"></script>
+  <script defer src="../katex/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        macros: { "\\dent": "\\mathrel{\\mid\\!\\sim}" }
+      });
+    });
+  </script>
 </head>
 <body>
 
 <header>
   <p class="back"><a href="../index.html">&larr; EDRS project</a></p>
-  <h1>[Closure]</h1>
-  <p class="byline">Antony Baker &middot; <a href="mailto:[email]">[email]</a></p>
+  <h1>Lexicographic Closure</h1>
+  <p class="byline">Augustine Mochoeneng &middot; <a href="mailto:MCHKOK003@myuct.ac.za">MCHKOK003@myuct.ac.za</a></p>
   <nav>
-    <a href="#aim">Aim</a>
+    <a href="#contribution">Contribution</a>
     <a href="#approach">Approach</a>
     <a href="#results">Results</a>
-    <a href="#downloads">Downloads</a>
+    <a href="#documents">Documents</a>
   </nav>
 </header>
 
 <main>
 
-  <section id="aim">
-    <h2>Aim</h2>
-    <p>
-                    Rational Closure
+  <section id="contribution" class="explain">
+    <h2>Contribution</h2>
+    <p class="lead">
+      I built the workbench end to end and used it to test the alignment theorem with
+      Lexicographic Closure.
     </p>
+    <ul class="rules">
+      <li><b>Workbench:</b> an executable version of the ECCRS-to-KLM translation, written in C.</li>
+      <li><b>Lexicographic Closure:</b> entailment over the translated knowledge base.</li>
+      <li><b>Verification:</b> MSW against LC on every instance of three benchmark rule sets.</li>
+      <li><b>Violation study:</b> rule sets that break each assumption on purpose, to see how the
+        agreement fails.</li>
+    </ul>
   </section>
 
-  <section id="approach">
+  <section id="approach" class="explain">
     <h2>Approach</h2>
+
+    <h3>The idea behind Lexicographic Closure</h3>
     <p>
-                    How Rational closure work
+      Rational Closure answers a query by throwing away whole ranks of statements until the
+      query makes sense. That is often too blunt: penguins lose "birds have wings" just because
+      it sits in the same rank as "birds fly". Lexicographic Closure keeps as much as it can and
+      discards only what actually clashes.
     </p>
-    <p>
-      On the ECCRS side, the workbench validates the three assumptions and records an explanation
-      trace for each prediction: the applicable rules, the overrides, and the rule that wins.
-    </p>
+
+    <h3>How it is computed</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="what">
+          <strong>BaseRank</strong>
+          <p>Rank statements from general to specific, exactly as Rational Closure does.</p>
+        </div>
+        $$\mathcal{E}_{i+1} = \{ \alpha \dent \beta \in \mathcal{E}_i : \overrightarrow{\mathcal{E}_i} \models \neg\alpha \}$$
+      </div>
+      <div class="step">
+        <div class="what">
+          <strong>SubsetRank</strong>
+          <p>Split each rank by how many of its statements are kept, so keeping more beats keeping fewer.</p>
+        </div>
+        $$\mathcal{D}_{i,j} = \bigvee_{X \subseteq \mathcal{B}_i,\ |X| = j} \ \bigwedge_{x \in X} \overrightarrow{x}$$
+      </div>
+      <div class="step">
+        <div class="what">
+          <strong>Query</strong>
+          <p>Run the usual removal loop on the finer ranking: drop one layer at a time until the
+            antecedent is consistent, then check the consequent.</p>
+        </div>
+        $$\mathcal{K} \models_{LC} F \dent m \iff \overrightarrow{\mathcal{R}_{\geq k}} \models F \rightarrow m$$
+      </div>
+    </div>
+
+    <h3>Implementation</h3>
+    <ul class="rules">
+      <li><b>Assumption validator:</b> checks sanity, strict exception closure and no total override
+        before anything runs, and halts with a report if one fails.</li>
+      <li><b>MSW side:</b> computes $\mathcal{A}(F)$ and $\mathcal{M}(F)$ and writes an explanation
+        trace for every instance.</li>
+      <li><b>Translator:</b> maps each rule to one typical statement, linear in the size of the rule set.</li>
+      <li><b>Reasoner:</b> every consistency check goes to a SAT solver (PicoSAT, bundled with the
+        code), and instances are answered in parallel with OpenMP.</li>
+      <li><b>Agreement check:</b> compares the two verdicts per instance and sorts each into agree,
+        abstain, disagree or conflict.</li>
+    </ul>
   </section>
 
-  <section id="results">
+  <section id="results" class="explain">
     <h2>Results</h2>
-    <p>
-                    results
+
+    <h3>When the assumptions hold</h3>
+    <table>
+      <thead>
+        <tr><th>Rule set</th><th>Instances</th><th>MSW = LC</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Bank</td><td>11,303</td><td>100%</td></tr>
+        <tr><td>Breast Cancer</td><td>175</td><td>100%</td></tr>
+        <tr><td>Mushroom</td><td>2,031</td><td>100%</td></tr>
+        <tr><td><b>Total</b></td><td><b>13,509</b></td><td><b>100%</b></td></tr>
+      </tbody>
+    </table>
+
+    <h3>When an assumption is broken</h3>
+    <table>
+      <thead>
+        <tr><th>Assumption broken</th><th>Agree</th><th>Abstain</th><th>Conflict</th><th>Wrong label</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Exception closure</td><td>13,395</td><td>114</td><td>0</td><td>0</td></tr>
+        <tr><td>Sanity</td><td>12,019</td><td>0</td><td>1,490</td><td>0</td></tr>
+        <tr><td>No total override</td><td>13,374</td><td>0</td><td>135</td><td>0</td></tr>
+      </tbody>
+    </table>
+    <ul class="rules">
+      <li><b>Exception closure broken:</b> one or both sides abstain instead of guessing.</li>
+      <li><b>Sanity or total override broken:</b> LC entails both labels, and the instance is
+        flagged as a conflict.</li>
+      <li><b>Total override:</b> the 135 conflicts are exactly the instances where ECCRS itself
+        changed its answer.</li>
+    </ul>
+    <p class="punchline">
+      Agreement is perfect when the theorem's assumptions hold, and when they break the check
+      fails safely: never a confident wrong label.
     </p>
   </section>
 
-  <section id="downloads">
-    <h2>Downloads</h2>
+  <section id="documents">
+    <h2>Documents</h2>
     <ul>
       <li><a href="docs/paper.pdf">Final paper</a> (PDF)</li>
       <li><a href="docs/literature-review.pdf">Literature review</a> (PDF)</li>
@@ -64,6 +159,3 @@
 
 </body>
 </html>
-
-
-
