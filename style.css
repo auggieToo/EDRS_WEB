@@ -119,8 +119,7 @@ header.home { padding: 0; background: var(--bg); color: var(--ink); }
 .hero
 {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  gap: 48px;
+  grid-template-columns: minmax(0, 1fr);
   max-width: 960px;
   margin: 0 auto;
   padding: 48px 20px;
@@ -141,89 +140,11 @@ header.home h1
   max-width: none;
   margin: 12px 0 16px;
   color: var(--slate);
-  font-size: clamp(34px, 3.4vw, 44px);
+  font-size: clamp(36px, 5vw, 60px);
 }
 
-.summary { margin: 0; max-width: 30em; font-size: 17px; }
+.summary { margin: 0; max-width: 36em; font-size: 19px; }
 .members { margin: 0; font: 14px var(--sans); color: var(--muted); }
-
-.strata { display: flex; flex-direction: column; margin: 0; border: 1px solid var(--rule); font-family: var(--sans); }
-
-.strata .query
-{
-  padding: 14px 28px;
-  background: var(--card);
-  border-bottom: 1px solid var(--rule);
-  font-size: 15px;
-  color: var(--muted);
-}
-
-.strata .query b { margin-left: 8px; font-size: 17px; color: var(--slate); }
-
-.rank
-{
-  flex: 1;
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 28px;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.45;
-  color: #fff;
-}
-
-.rank .r { font-size: 28px; font-weight: 800; }
-.rank small { display: block; margin-top: 2px; font-size: 13px; opacity: 0.85; }
-.rank .why { text-align: right; }
-.rank .why b { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 14px; }
-
-.rank-0
-{
-  background: repeating-linear-gradient(135deg, #DDE1E6 0 7px, #E8EBEE 7px 14px);
-  color: var(--slate);
-}
-.rank-0 .r, .rank-0 .why { color: var(--s2); }
-.rank-0 .why b { color: var(--rust); border: 1.5px solid var(--rust); background: var(--bg); }
-
-.rank-1 { background: var(--s2); }
-.rank-1 .why { color: #E2E5E9; }
-.rank-1 .why b { background: var(--rust); color: #fff; }
-
-.rank-inf { flex: 0.7; background: var(--slate); }
-
-.strata .ranked
-{
-  padding: 8px 28px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--rule);
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.strata .verdicts
-{
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: var(--card);
-  border-top: 1px solid var(--rule);
-  text-align: left;
-}
-
-.verdicts span
-{
-  padding: 10px 14px;
-  border-right: 1px solid var(--rule);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--rust);
-}
-
-.verdicts span:first-child { background: var(--slate); color: #fff; }
-.verdicts span:last-child { border-right: 0; }
-.verdicts small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
-.verdicts span:first-child small { color: var(--s0); }
 
 header.home nav
 {
@@ -275,8 +196,6 @@ p, li { max-width: 46em; }
 .lead
 {
   margin: 0 0 22px;
-  padding-left: 22px;
-  border-left: 4px solid var(--rust);
   font-size: 21px;
   line-height: 1.55;
 }
@@ -351,12 +270,9 @@ ul.rules > li::before, ul.closures > li::before
   gap: 8px 24px;
   padding: 16px 18px;
   border-bottom: 1px solid var(--rule);
-  border-left: 6px solid var(--s1);
   overflow-x: auto;
 }
 
-.step:nth-child(2) { border-left-color: var(--s2); }
-.step:nth-child(n+3) { border-left-color: var(--slate); }
 .step:last-child { border-bottom: 0; }
 
 .step .what { flex: 0 1 300px; }
@@ -490,7 +406,6 @@ tbody tr:hover td { background: #F0F2F4; }
   padding: 12px 16px;
   background: var(--card);
   border: 1px solid var(--rule);
-  border-left: 4px solid var(--rust);
   color: var(--muted);
 }
 
@@ -536,14 +451,8 @@ footer p { margin: 0; max-width: none; }
   header h1 { max-width: none; }
   nav { max-width: none; gap: 4px 20px; }
 
-  .hero { grid-template-columns: 1fr; gap: 32px; padding: 32px 20px; }
+  .hero { padding: 32px 20px; }
 
-  .rank { grid-template-columns: 32px 1fr; padding: 14px 20px; }
-  .rank .why { grid-column: 2; text-align: left; }
-  .strata .query, .strata .ranked { padding-left: 20px; padding-right: 20px; }
-  .strata .verdicts { grid-template-columns: 1fr 1fr; }
-  .verdicts span:nth-child(2) { border-right: 0; }
-  .verdicts span:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
 
   h2 { font-size: 26px; }
   .lead { font-size: 19px; }
