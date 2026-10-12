@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Augustine Mochoeneng: Lexicographic Closure | EDRS</title>
+  <title>Daniel Schlesinger: Rational Closure | EDRS</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../katex/katex.min.css">
   <script defer src="../katex/katex.min.js"></script>
@@ -24,8 +24,8 @@
 
 <header>
   <p class="back"><a href="../index.html">&larr; EDRS project</a></p>
-  <h1>Rational Closure </h1>
-  <p class="byline">Daniel Schlesinger &middot; <a href="mailto:schdan066@myuct.ac.za">SCHDAN066@myuct.ac.za</a></p>
+  <h1>Rational Closure</h1>
+  <p class="byline">Daniel Schlesinger &middot; <a href="mailto:SCHDAN066@myuct.ac.za">SCHDAN066@myuct.ac.za</a></p>
   <nav>
     <a href="#contribution">Contribution</a>
     <a href="#approach">Approach</a>
@@ -39,34 +39,35 @@
   <section id="contribution" class="explain">
     <h2>Contribution</h2>
     <p class="lead">
-      I built the workbench end to end and used it to test the alignment theorem with
-      Rational Closure (RC). I also implemented and measured an optimised Rational Closure.
-
-grouping
-patterns by which rules they make applicable, instead of calling
-the satisfiability oracle once per pattern, cuts those calls by up
-to 964-fold on Bank Marketing, the largest of the three rulesets
-(904-fold against a naive ascending-scan baseline rather than the
-binary search shipped by default), verified by differential testing
-against the ungrouped computation.
+      I developed the EDRS workbench end to end and used it to evaluate the alignment theorem,
+      which states that Rational Closure (RC) and Most Specific Wins (MSW) yield identical
+      predictions on every instance of a rule set satisfying three structural conditions. I also
+      designed an optimised RC procedure that reduces the satisfiability calls required to
+      evaluate the largest rule set from 98,304 to 102.
     </p>
     <ul class="rules">
-      <li><b>Workbench:</b> A Command Line Interface application of ECCRS-to-KLM translation, written in python.</li>
-      <li><b>Naivee Rational Closure :</b> entailment over the translated knowledge base.</li>
-      <li><b>Optimised Rational Closure :</b> entailment over the translated knowledge base using an optimized version  of Rational Closure.</li>
-      <li><b>Verification:</b> MSW against RC on every instance of three benchmark rule sets.</li>
+      <li><b>Workbench:</b> a Python command-line application that parses an ECCRS rule set,
+        validates it, translates it into a KLM knowledge base, evaluates RC and MSW, and presents
+        both explanation traces side by side. It has no runtime dependencies.</li>
+      <li><b>Rational Closure:</b> BaseRank and entailment checking, implemented from first
+        principles, including the SAT solver.</li>
+      <li><b>Optimisation:</b> a 964-fold reduction in solver calls on Bank Marketing, with
+        identical results.</li>
+      <li><b>Verification:</b> a comparison of RC and MSW on three benchmark rule sets, together
+        with a scholarship rule set that deliberately violates the theorem's assumptions.</li>
     </ul>
   </section>
 
   <section id="approach" class="explain">
     <h2>Approach</h2>
 
-    <h3>The idea behind Rational  Closure</h3>
+    <h3>The idea behind Rational Closure</h3>
     <p>
-      Rational Closure answers a query by throwing away whole ranks of statements until the
-      query makes sense. That is often too blunt: penguins lose "birds have wings" just because
-      it sits in the same rank as "birds fly". Lexicographic Closure keeps as much as it can and
-      discards only what actually clashes.
+      Rational Closure orders the statements of a knowledge base by their degree of
+      exceptionality. A query is answered by discarding the most general ranks until its premise
+      is consistent with the remaining statements, and then testing whether the conclusion
+      follows. The alignment theorem is formulated with respect to RC, and both Lexicographic
+      Closure and System W extend its ranking.
     </p>
 
     <h3>How it is computed</h3>
@@ -74,39 +75,70 @@ against the ungrouped computation.
       <div class="step">
         <div class="what">
           <strong>BaseRank</strong>
-          <p>Rank statements from general to specific, exactly as Rational Closure does.</p>
+          <p>Statements whose premise is inconsistent with the remaining knowledge base are
+            removed iteratively. Each removed layer is assigned the next rank, and any statement
+            never removed receives rank $\infty$.</p>
         </div>
-        $$\mathcal{E}_{i+1} = \{ \alpha \dent \beta \in \mathcal{E}_i : \overrightarrow{\mathcal{E}_i} \models \neg\alpha \}$$
+        $$\mathcal{E}_0 = \mathcal{K}, \qquad \mathcal{E}_{i+1} = \{ \alpha \dent \beta \in \mathcal{E}_i : \overrightarrow{\mathcal{E}_i} \models \neg\alpha \}$$
       </div>
       <div class="step">
         <div class="what">
-          <strong>SubsetRank</strong>
-          <p>Split each rank by how many of its statements are kept, so keeping more beats keeping fewer.</p>
+          <strong>Base rank of a query</strong>
+          <p>The lowest rank at which the premise is consistent with the statements at that rank
+            and above.</p>
         </div>
-        $$\mathcal{D}_{i,j} = \bigvee_{X \subseteq \mathcal{B}_i,\ |X| = j} \ \bigwedge_{x \in X} \overrightarrow{x}$$
+        $$br_{\mathcal{K}}(\alpha) = \min \{ i : \overrightarrow{\mathcal{R}_{\geq i}} \not\models \neg\alpha \}$$
       </div>
       <div class="step">
         <div class="what">
-          <strong>Query</strong>
-          <p>Run the usual removal loop on the finer ranking: drop one layer at a time until the
-            antecedent is consistent, then check the consequent.</p>
+          <strong>Entailment</strong>
+          <p>Each instance $F$ is queried twice, once for $m$ and once for $\neg m$.</p>
         </div>
-        $$\mathcal{K} \models_{LC} F \dent m \iff \overrightarrow{\mathcal{R}_{\geq k}} \models F \rightarrow m$$
+        $$\mathcal{K} \models_{RC} F \dent m \iff br_{\mathcal{K}}(F) \lt br_{\mathcal{K}}(F \land \neg m)$$
       </div>
     </div>
 
+    <h3>Optimisation</h3>
+    <p>
+      Verifying the theorem requires querying RC on every complete feature pattern. Bank
+      Marketing has 16,384 of these, and each requires several calls to the SAT solver. The
+      central observation is that MSW and RC depend on a pattern solely through the set of rules
+      applicable to it. Since many patterns share the same applicable rules, the workbench
+      partitions them into equivalence classes by a direct lookup that requires no solver calls.
+      It evaluates each class once and weights the result by the size of the class. The procedure
+      is exact, and it is verified against the ungrouped computation on every pattern. In
+      addition, a binary search over the ranks determines each base rank in $O(\log k)$ solver
+      calls.
+    </p>
+    <table>
+      <caption>Satisfiability calls for the full pattern-space check</caption>
+      <thead>
+        <tr><th>Rule set</th><th>Patterns</th><th>Before</th><th>Grouped</th><th>Speed-up</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Breast Cancer</td><td>64</td><td>400</td><td>64</td><td>6&times;</td></tr>
+        <tr><td>Mushroom</td><td>1,024</td><td>6,144</td><td>66</td><td>93&times;</td></tr>
+        <tr><td>Bank Marketing</td><td>16,384</td><td>98,304</td><td>102</td><td><b>964&times;</b></td></tr>
+      </tbody>
+    </table>
+    <p>On Bank Marketing, execution time is reduced from 3.24 seconds to 0.10 seconds.</p>
+
     <h3>Implementation</h3>
     <ul class="rules">
-      <li><b>Assumption validator:</b> checks sanity, strict exception closure and no total override
-        before anything runs, and halts with a report if one fails.</li>
-      <li><b>MSW side:</b> computes $\mathcal{A}(F)$ and $\mathcal{M}(F)$ and writes an explanation
-        trace for every instance.</li>
-      <li><b>Translator:</b> maps each rule to one typical statement, linear in the size of the rule set.</li>
-      
-    <li><b>Reasoner:</b> DAN REWRITE THIS: every consistency check goes to a SAT solver (PicoSAT, bundled with the
-        code), and instances are answered in parallel with OpenMP.</li>
-      <li><b>Agreement check:</b> compares the two verdicts per instance and sorts each into agree,
-        abstain, disagree or conflict.</li>
+      <li><b>Assumption validator:</b> checks sanity, strict global exception closure and no
+        total override. It reports every violation and returns a non-zero exit status, while
+        completing the run so that the effect of a violation remains observable.</li>
+      <li><b>MSW:</b> computed directly from the rule set and independent of the translation,
+        providing an independent check on RC.</li>
+      <li><b>Translator:</b> maps each rule to exactly one defeasible conditional over a fresh
+        class atom $m$.</li>
+      <li><b>Reasoner:</b> BaseRank and entailment built on a DPLL SAT solver implemented from
+        first principles in Python.</li>
+      <li><b>Explanation traces:</b> the ECCRS override chain presented alongside the RC rank
+        comparison. Both identify the same deciding rule.</li>
+      <li><b>Testing:</b> validation against published worked examples, differential testing
+        against an independent brute-force oracle over 312 random knowledge bases and 3,120
+        queries, and a pattern-by-pattern comparison of grouped and ungrouped results.</li>
     </ul>
   </section>
 
@@ -116,16 +148,29 @@ against the ungrouped computation.
     <h3>When the assumptions hold</h3>
     <table>
       <thead>
-        <tr><th>Rule set</th><th>Instances</th><th>MSW =RC </th></tr>
+        <tr><th>Rule set</th><th>Holdout instances</th><th>All instances</th><th>Complete patterns</th><th>MSW = RC</th></tr>
       </thead>
       <tbody>
-        <tr><td>Bank</td><td>11,303</td><td>100%</td></tr>
-        <tr><td>Breast Cancer</td><td>175</td><td>100%</td></tr>
-        <tr><td>Mushroom</td><td>2,031</td><td>100%</td></tr>
-        <tr><td><b>Total</b></td><td><b>13,509</b></td><td><b>100%</b></td></tr>
+        <tr><td>Breast Cancer</td><td>175</td><td>699</td><td>64</td><td>100%</td></tr>
+        <tr><td>Mushroom</td><td>2,031</td><td>8,124</td><td>1,024</td><td>100%</td></tr>
+        <tr><td>Bank Marketing</td><td>11,303</td><td>45,211</td><td>16,384</td><td>100%</td></tr>
+        <tr><td><b>Total</b></td><td><b>13,509</b></td><td><b>54,034</b></td><td><b>17,472</b></td><td><b>100%</b></td></tr>
       </tbody>
     </table>
+    <ul class="rules">
+      <li>No disagreements or abstentions occurred in any population.</li>
+      <li>On the 771 holdout instances in which a rule is overridden by a more specific rule, RC
+        agrees with MSW in every case.</li>
+      <li>An independent implementation supplied with the datasets reproduces the workbench's MSW
+        labels, applicable rules and maximal rules on all 13,509 holdout instances.</li>
+    </ul>
 
+    <h3>When the assumptions are violated</h3>
+    <p>
+      On a small scholarship rule set that violates the theorem's assumptions, RC and MSW diverge
+      on a single pattern out of 32, which is precisely the pattern identified by the validator.
+      They agree on all remaining patterns.
+    </p>
   </section>
 
   <section id="documents">
