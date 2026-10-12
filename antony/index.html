@@ -75,15 +75,18 @@
           <strong>SubsetInclusion</strong>
           <p>H contains either the non-falsifying formula or the falsifying formula for every conditional in the belief base.</p>
         </div>
-        $$\mathcal{H} = \bigcup_{i \in \mathcal{B}_i,\ |X| = j} \ \bigwedge_{x \in X} \overrightarrow{x}$$
+        $$\mathcal{H} = \bigcup_{i \in \{j+1,...,k\}} nf(\Delta_{nf}^i) \cup \overline{nf\Delta_{f}^i}$$
       </div>
       <div class="step">
         <div class="what">
           <strong>Query</strong>
-          <p>Run the usual removal loop on the finer ranking: drop one layer at a time until the
-            antecedent is consistent, then check the consequent.</p>
+          <p>Run the query check each set of conditionals layer by layer until 
+            we have checked all falsifying or non-falsifying conditionals. The query is entailed
+            if it is not falsified by any of the sets of conditionals.
+          </p>
+            
         </div>
-        $$\mathcal{K} \models_{LC} F \dent m \iff \overrightarrow{\mathcal{R}_{\geq k}} \models F \rightarrow m$$
+        $$\mathcal{K} \models_{SW} F \dent m \iff \overrightarrow{\mathcal{R}_{\geq k}} \models F \rightarrow m$$
       </div>
     </div>
 
@@ -94,8 +97,8 @@
       <li><b>MSW side:</b> computes $\mathcal{A}(F)$ and $\mathcal{M}(F)$ and writes an explanation
         trace for every instance.</li>
       <li><b>Translator:</b> maps each rule to one typical statement, linear in the size of the rule set.</li>
-      <li><b>Reasoner:</b> every consistency check goes to a SAT solver (PicoSAT, bundled with the
-        code), and instances are answered in parallel with OpenMP.</li>
+      <li><b>Reasoner:</b> every consistency check goes to a SAT solver (z3, bundled with the
+        code).</li>
       <li><b>Agreement check:</b> compares the two verdicts per instance and sorts each into agree,
         abstain, disagree or conflict.</li>
     </ul>
@@ -107,7 +110,7 @@
     <h3>When the assumptions hold</h3>
     <table>
       <thead>
-        <tr><th>Rule set</th><th>Instances</th><th>MSW = LC</th></tr>
+        <tr><th>Rule set</th><th>Instances</th><th>MSW = SW</th></tr>
       </thead>
       <tbody>
         <tr><td>Bank</td><td>11,303</td><td>100%</td></tr>
@@ -117,35 +120,14 @@
       </tbody>
     </table>
 
-    <h3>When an assumption is broken</h3>
-    <table>
-      <thead>
-        <tr><th>Assumption broken</th><th>Agree</th><th>Abstain</th><th>Conflict</th><th>Wrong label</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Exception closure</td><td>13,395</td><td>114</td><td>0</td><td>0</td></tr>
-        <tr><td>Sanity</td><td>12,019</td><td>0</td><td>1,490</td><td>0</td></tr>
-        <tr><td>No total override</td><td>13,374</td><td>0</td><td>135</td><td>0</td></tr>
-      </tbody>
-    </table>
-    <ul class="rules">
-      <li><b>Exception closure broken:</b> one or both sides abstain instead of guessing.</li>
-      <li><b>Sanity or total override broken:</b> LC entails both labels, and the instance is
-        flagged as a conflict.</li>
-      <li><b>Total override:</b> the 135 conflicts are exactly the instances where ECCRS itself
-        changed its answer.</li>
-    </ul>
-    <p class="punchline">
-      Agreement is perfect when the theorem's assumptions hold, and when they break the check
-      fails safely: never a confident wrong label.
-    </p>
+ 
   </section>
 
   <section id="documents">
     <h2>Documents</h2>
     <ul>
-      <li><a href="docs/paper.pdf">Final paper</a> (PDF)</li>
-      <li><a href="docs/literature-review.pdf">Literature review</a> (PDF)</li>
+      <li><a href="docs/EDRS_Antony_Baker.pdf">Final paper</a> (PDF)</li>
+      <li><a href="docs/Literature_Review___EDRS___Antony_Baker.pdf">Literature review</a> (PDF)</li>
       <li><a href="docs/edrs-workbench.zip">Source code</a> (ZIP)</li>
     </ul>
   </section>
