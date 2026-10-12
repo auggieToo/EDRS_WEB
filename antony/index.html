@@ -24,8 +24,8 @@
 
 <header>
   <p class="back"><a href="../index.html">&larr; EDRS project</a></p>
-  <h1>Lexicographic Closure</h1>
-  <p class="byline">Augustine Mochoeneng &middot; <a href="mailto:MCHKOK003@myuct.ac.za">MCHKOK003@myuct.ac.za</a></p>
+  <h1>System W</h1>
+  <p class="byline">Antony Baker &middot; <a href="mailto:BKRANT001@myuct.ac.za">BKRANT001@myuct.ac.za</a></p>
   <nav>
     <a href="#contribution">Contribution</a>
     <a href="#approach">Approach</a>
@@ -39,22 +39,21 @@
   <section id="contribution" class="explain">
     <h2>Contribution</h2>
     <p class="lead">
-      I built the workbench end to end and used it to test the alignment theorem with
-      Lexicographic Closure.
+      I built the EDRS workbench which translates to System W 
+      belief bases and runs the Inference using InfOCF System W 
+      implementation.
     </p>
     <ul class="rules">
-      <li><b>Workbench:</b> an executable version of the ECCRS-to-KLM translation, written in C.</li>
-      <li><b>Lexicographic Closure:</b> entailment over the translated knowledge base.</li>
-      <li><b>Verification:</b> MSW against LC on every instance of three benchmark rule sets.</li>
-      <li><b>Violation study:</b> rule sets that break each assumption on purpose, to see how the
-        agreement fails.</li>
+      <li><b>Workbench:</b> an executable version of the ECCRS-to-KLM translation, written in Python.</li>
+      <li><b>System W:</b> entailment over the translated knowledge base.</li>
+      <li><b>Verification:</b> MSW against System W on every instance of three benchmark rule sets.</li>
     </ul>
   </section>
 
   <section id="approach" class="explain">
     <h2>Approach</h2>
 
-    <h3>The idea behind Lexicographic Closure</h3>
+    <h3>The idea behind System W</h3>
     <p>
       Rational Closure answers a query by throwing away whole ranks of statements until the
       query makes sense. That is often too blunt: penguins lose "birds have wings" just because
@@ -73,10 +72,10 @@
       </div>
       <div class="step">
         <div class="what">
-          <strong>SubsetRank</strong>
-          <p>Split each rank by how many of its statements are kept, so keeping more beats keeping fewer.</p>
+          <strong>SubsetInclusion</strong>
+          <p>H contains either the non-falsifying formula or the falsifying formula for every conditional in the belief base.</p>
         </div>
-        $$\mathcal{D}_{i,j} = \bigvee_{X \subseteq \mathcal{B}_i,\ |X| = j} \ \bigwedge_{x \in X} \overrightarrow{x}$$
+        $$\mathcal{H} = \bigcup_{i \in \mathcal{B}_i,\ |X| = j} \ \bigwedge_{x \in X} \overrightarrow{x}$$
       </div>
       <div class="step">
         <div class="what">
