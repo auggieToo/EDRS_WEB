@@ -23,11 +23,38 @@
 <main>
 
   <section id="goals">
-    <h2>Project goals</h2>
+    <h2>Introduction</h2>
     <p>
-      An ECCRS classifier explains each prediction by pointing at the rule that decided it.
-      We asked whether those explanations are formally sound: does each prediction actually
-      follow from the rule set under KLM defeasible reasoning?
+    Systems utilizing Machine Learning models are increasingly 
+    deployed across domains involving high-stakes decisions, where they
+    replace, improve, or assist decisions traditionally made by humans.
+    However, their predictions often rely on internal representations,
+    weights, embeddings, and learned feature interactions that have
+    no natural correspondence to human reasoning. 
+    Any decision-making system, not only those built on machine learning, faces an 
+    explainability problem when its decisions are used to justify consequential outcomes.
+    Explainability is the property by which a model can produce details or reasons that make its 
+    functioning easy and clear to understand
+    </p>
+    <p>
+    Symbolic rule-based classifiers mitigate the problem of explainability by construction rather than reconstruction.
+    They consist of explicit “IF-THEN” decision rules over meaningful features.
+
+    In this project, we study Exception Closed Conjuctive Rule Sets, (ECCRS); it is built for rules learnt from data with 
+    exceptions and conflict, resolving them through a Most Specific Wins(MSW) operator. MSW states that when multiple rules apply from a 
+    given instance ("situation"), the rule which is strictly more specfic than the other determines the conclusion / prediction. 
+    The explainability of this classifier comes naturally as 1) A set of rules that applies in a given instance, 
+    2) Rules that are strictly more specific than other, and overrides them 3) The prediction/conclusion from the surving rules. 
+    </p>
+                
+    <p>
+
+    ECCRS' inference method for dealing with exception and conclusion is clean and straighforward , producing human readable explanation. 
+    It does not, however establish that the resulting decision is semantically correct under a formal theory of reasoning with exceptions. 
+    This motivates checking ECCRS against such a theory: the KLM framework, a standard formal account of defeasible reasoning, 
+    where conclusions hold by default but may be withdrawn when more specific information applies, 
+    developed by Kraus, Lehmann and Magidor \cite{Kraus90}. The framework offers several concrete methods for
+    deciding what a set of default rules implies; we use the following ones: Rational Closure, Lexicographic Closure and System W.
     </p>
     <ul>
       <li>Translate ECCRS rule sets into KLM knowledge bases.</li>
