@@ -114,15 +114,16 @@ nav a:hover, nav a:focus-visible { color: #fff; border-bottom-color: var(--rust)
 
 /* ---------- Header (project page): hero with a worked Rational Closure example ---------- */
 
-header.home { padding: 0; }
+header.home { padding: 0; background: var(--bg); color: var(--ink); }
 
 .hero
 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 470px;
-  background: var(--bg);
-  color: var(--ink);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 48px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 20px;
 }
 
 .hero-text
@@ -131,7 +132,6 @@ header.home { padding: 0; }
   flex-direction: column;
   justify-content: space-between;
   gap: 24px;
-  padding: 44px 48px 36px max(20px, calc(50vw - 480px));
 }
 
 .kicker { margin: 0; font: 600 14px var(--sans); color: var(--rust); }
@@ -141,13 +141,13 @@ header.home h1
   max-width: none;
   margin: 12px 0 16px;
   color: var(--slate);
-  font-size: clamp(36px, 4vw, 50px);
+  font-size: clamp(34px, 3.4vw, 44px);
 }
 
 .summary { margin: 0; max-width: 30em; font-size: 17px; }
-.members { margin: 0; font: 15px var(--sans); color: var(--muted); }
+.members { margin: 0; font: 14px var(--sans); color: var(--muted); }
 
-.strata { display: flex; flex-direction: column; margin: 0; font-family: var(--sans); }
+.strata { display: flex; flex-direction: column; margin: 0; border: 1px solid var(--rule); font-family: var(--sans); }
 
 .strata .query
 {
@@ -176,8 +176,8 @@ header.home h1
 
 .rank .r { font-size: 28px; font-weight: 800; }
 .rank small { display: block; margin-top: 2px; font-size: 13px; opacity: 0.85; }
-.rank .why { max-width: 190px; font-size: 13px; line-height: 1.35; text-align: right; }
-.rank .why b { display: inline-block; margin-bottom: 4px; padding: 3px 10px; border-radius: 3px; font-size: 14px; }
+.rank .why { text-align: right; }
+.rank .why b { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 14px; }
 
 .rank-0
 {
@@ -193,16 +193,37 @@ header.home h1
 
 .rank-inf { flex: 0.7; background: var(--slate); }
 
-.strata figcaption
+.strata .ranked
 {
-  padding: 12px 28px;
+  padding: 8px 28px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.strata .verdicts
+{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   background: var(--card);
   border-top: 1px solid var(--rule);
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--muted);
   text-align: left;
 }
+
+.verdicts span
+{
+  padding: 10px 14px;
+  border-right: 1px solid var(--rule);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--rust);
+}
+
+.verdicts span:first-child { background: var(--slate); color: #fff; }
+.verdicts span:last-child { border-right: 0; }
+.verdicts small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.verdicts span:first-child small { color: var(--s0); }
 
 header.home nav
 {
@@ -515,12 +536,14 @@ footer p { margin: 0; max-width: none; }
   header h1 { max-width: none; }
   nav { max-width: none; gap: 4px 20px; }
 
-  .hero { grid-template-columns: 1fr; min-height: 0; }
-  .hero-text { padding: 32px 20px; }
+  .hero { grid-template-columns: 1fr; gap: 32px; padding: 32px 20px; }
 
   .rank { grid-template-columns: 32px 1fr; padding: 14px 20px; }
-  .rank .why { grid-column: 2; max-width: none; text-align: left; }
-  .strata .query, .strata figcaption { padding-left: 20px; padding-right: 20px; }
+  .rank .why { grid-column: 2; text-align: left; }
+  .strata .query, .strata .ranked { padding-left: 20px; padding-right: 20px; }
+  .strata .verdicts { grid-template-columns: 1fr 1fr; }
+  .verdicts span:nth-child(2) { border-right: 0; }
+  .verdicts span:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
 
   h2 { font-size: 26px; }
   .lead { font-size: 19px; }

@@ -37,23 +37,26 @@
     </div>
     <figure class="strata">
       <div class="query">Is this mushroom edible? <b>odour none, spores green</b></div>
+      <div class="ranked">Ranked by BaseRank, the first step shared by RC, LC and System W</div>
       <div class="rank rank-0">
         <span class="r">0</span>
         <div>odour none |&sim; edible<br>odour foul |&sim; poisonous<small>most general rules</small></div>
-        <div class="why"><b>set aside</b><br>contradicts the query</div>
+        <div class="why"><b>clashes</b></div>
       </div>
       <div class="rank rank-1">
         <span class="r">1</span>
-        <div>odour none &and; spores green |&sim; poisonous<small>more specific exception</small></div>
-        <div class="why"><b>poisonous</b><br>first rank consistent with the query</div>
+        <div>odour none &and; spores green |&sim; poisonous<small>first rank consistent with the query</small></div>
+        <div class="why"><b>poisonous</b></div>
       </div>
       <div class="rank rank-inf">
         <span class="r">&infin;</span>
         <div>classical facts<small>never set aside</small></div>
       </div>
-      <figcaption>
-        Rational Closure drops ranks from the most general down until the query fits, then answers
-        from what is left. ECCRS gives the same answer: the more specific rule wins.
+      <figcaption class="verdicts">
+        <span><small>ECCRS</small>poisonous</span>
+        <span><small>Rational Closure</small>poisonous</span>
+        <span><small>Lexicographic</small>poisonous</span>
+        <span><small>System W</small>poisonous</span>
       </figcaption>
     </figure>
   </div>
@@ -160,16 +163,6 @@
       never has to break a tie.
     </p>
 
-    <h3>Try it: odour = none, spore = green</h3>
-    <ol class="trace">
-      <li><b class="k">Fires</b> $r_1$ and $r_2$. $r_3$ stays quiet.</li>
-      <li><b class="k">Compare</b> $B_{r_1} \subset B_{r_2}$, so $r_2$ overrides $r_1$.</li>
-      <li><b class="k">Winner</b> $\mathcal{M}(F) = \{r_2\}$</li>
-      <li class="answer"><b class="k">Answer</b> poisonous</li>
-    </ol>
-    <p class="punchline">
-      That trace <em>is</em> the explanation. No separate story is bolted on afterwards.
-    </p>
   </section>    
   <section id="defeasible" class="explain">
     <h2>Defeasible reasoning (KLM)</h2>
